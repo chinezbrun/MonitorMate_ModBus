@@ -436,6 +436,7 @@ function parseFXRData($raw_data) {
 		8 => "Support",
 		9 => "Sell",
 		10 => "Pass-through",
+		14 => "Offsetting", // DPO added - operating mode specific to FRX models
 		90 => "Inverter Error",
 		91 => "AGS Error",
 		92 => "Comm Error"
