@@ -57,6 +57,16 @@
 						$('#device_'+i).data('devAddress', ID.fx+':'+devices_array[i].address);
 						set_status('device_'+i, $('#device_'+i).data('devAddress'));
 						break;
+						// section added by DPO to cover FXR invertor cases
+					case ID.fxr:
+						if ($('#inverters').text() == "None Found") {
+							$('#inverters').text('');
+						}
+						$('#inverters').append("<div class='status' style='display: inline-block;'><div id='device_"+i+"' class='status_content'>Inverter Found.</div></div>&nbsp;");
+						$('#device_'+i).data('devAddress', ID.fxr+':'+devices_array[i].address);
+						set_status('device_'+i, $('#device_'+i).data('devAddress'));
+						break;				
+						// end of section DPO
 					case ID.cc:
 						if ($('#charge_controllers').text() == "None Found") {
 							$('#charge_controllers').text('');
