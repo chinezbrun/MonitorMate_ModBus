@@ -623,6 +623,7 @@ function get_inverter_power() {
 	var chart_options = {};
 //	var count;
 
+
 	for (var port in full_day_data[ID.fx]) {
 		// port interates through each fx-series inverters
 
@@ -659,8 +660,45 @@ function get_inverter_power() {
 			}
 		}
 	}
+// DPO added for FXR inverter
+	for (var port in full_day_data[ID.fxr]) {
+			// port interates through each fx-series inverters
 
+		if (port != "totals") {
+			day_data_watts[port] = [];
+		}
 
+		for (y = 0; y < full_day_data[ID.fxr][port].length; y++) {
+			// y is the datapoint (from 0 to n)
+
+			if (port == "totals") {
+
+				total_watts = (full_day_data[ID.fxr][port][y].inverter_current) * 1 * full_day_data[ID.fxr][port][y].ac_output_voltage;
+				total_day_data_watts[y] = [full_day_data[ID.fxr][port][y].timestamp, total_watts];
+				
+			} else {
+
+				// IF there is charge current, plot the charger amps as a positive value
+				// ELSE we'll assume it's inverter and plot the inverter amps as a negative value
+				
+				if (full_day_data[ID.fxr][port][y].charge_current > 0) {
+					chart_watts = full_day_data[ID.fxr][port][y].charge_current * full_day_data[ID.fxr][port][y].ac_output_voltage;
+				} else {
+					chart_watts = -(full_day_data[ID.fxr][port][y].inverter_current * full_day_data[ID.fxr][port][y].ac_output_voltage);
+				}
+
+				// make an object with some extra data (charge mode) that we can display in tooltips.
+				day_data_watts[port][y] = {
+					x: full_day_data[ID.fxr][port][y].timestamp,
+					y: chart_watts,
+					mode: "(" + full_day_data[ID.fxr][port][y].operational_mode + ")"
+				};
+
+			}
+		}
+	}
+//DPO end 	
+	
 	// Set up each series.
 	for (var i in day_data_watts) {
 		device_data = {
