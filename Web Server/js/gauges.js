@@ -385,6 +385,22 @@ function get_inverter_power_gauge(chart) {
 				total_watts = total_watts + inverting_watts;
 			}
 		}
+	// DPO added to show FXR data
+	if (json_status['devices'][i]['device_id'] == ID.fxr) {
+			var device = json_status['devices'][i];
+			if (device.operational_mode == "Charge") {
+				chart_mode = "Charging";
+				chart_max = CONFIG.chargerMax;
+				var charging_watts = device.charge_current * device.ac_input_voltage;
+				total_watts = total_watts + charging_watts;
+			} else {
+				chart_mode = "Inverting";
+				chart_max = CONFIG.inverterMax;
+				var inverting_watts = device.inverter_current * device.ac_output_voltage;
+				total_watts = total_watts + inverting_watts;
+			}
+		}
+	// DPO end 
 	}
 	total_watts = Math.round(total_watts / 10) * 10;
 
