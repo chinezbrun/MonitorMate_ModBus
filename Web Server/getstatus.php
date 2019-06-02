@@ -82,10 +82,10 @@ function query_years($date) {
 				GROUP BY year(date)
 				ORDER BY year";
 
-	$query_result = mysql_query($query,$connection);
+	$query_result = mysqli_query($connection,$query);
 	$result = NULL;
 
-	while($row = mysql_fetch_assoc($query_result)){
+	while($row = mysqli_fetch_assoc($query_result)){
 			$result[] = $row;
 	}
 	
@@ -136,13 +136,13 @@ function query_months($date) {
 				GROUP BY month
 				ORDER BY month";
 
-	$query_result = mysql_query($query, $connection);
+	$query_result = mysqli_query($connection,$query);
 	$result=NULL;
 	
-	while($row = mysql_fetch_assoc($query_result)){
+	while($row = mysqli_fetch_assoc($query_result)){
 			$result[] = $row;
 	}
-	
+
 	$json_months = json_encode($result, JSON_NUMERIC_CHECK);
 	outputJSON($json_months);
 
@@ -207,15 +207,19 @@ function query_days($date) {
 				WHERE ".$whereClause."
 				ORDER BY date";
 				
-	$query_result = mysql_query($query, $connection);
+	$query_result = mysqli_query($connection, $query);
 	$result=NULL;
 	
-	while($row = mysql_fetch_assoc($query_result)){
+	while($row = mysqli_fetch_assoc($query_result)){
 			$timestamp = strtotime($row['date'])*1000;				// get timestamp in seconds, convert to milliseconds
 			$stampedRow = array("timestamp"=>$timestamp) + $row;	// put it in an assoc array and merge them
 			$result[] = $stampedRow;
 	}
-		
+	//echo "<br>";
+	//print($results); //dpo
+	//print($whereClause); //dpo
+	//print($start_date);	//dpo
+	//echo "<br>";
 	$json_month_days = json_encode($result, JSON_NUMERIC_CHECK);
 	outputJSON($json_month_days);
 }
@@ -285,16 +289,16 @@ function query_full_day($date, $scope){
 						WHERE ".$whereClause."
 						ORDER BY date";
 		
-	$result_summary	= mysql_query($query_summary, $connection);
-	$result_cc = mysql_query($query_cc, $connection);
-	$result_fndc = mysql_query($query_fndc, $connection);
-	$result_fx = mysql_query($query_fx, $connection);
-	$result_radian = mysql_query($query_radian, $connection);
+	$result_summary	= mysqli_query($connection,$query_summary);
+	$result_cc = mysqli_query($connection, $query_cc);
+	$result_fndc = mysqli_query($connection,$query_fndc);
+	$result_fx = mysqli_query($connection,$query_fx);
+	$result_radian = mysqli_query($connection, $query_radian);
 	
 	$full_day_querys = array("cc"=>$result_cc,"fndc"=>$result_fndc,"fx"=>$result_fx,"radian"=>$result_radian);
 
 	// Summary only needs to net values to be computed, then add to full_day_data
-	while ($row = mysql_fetch_assoc($result_summary)) {
+	while ($row = mysqli_fetch_assoc($result_summary)) {
 		// set_elementTypes($row); // row passed as a reference.
 		$row['kwh_net'] = $row['kwh_in'] - $row['kwh_out'];
 		$row['ah_net'] = $row['ah_in'] - $row['ah_out'];
@@ -303,7 +307,7 @@ function query_full_day($date, $scope){
 	
 	// All other queries need a proper timestamp added.
 	foreach ($full_day_querys as $i) {
-		while ($row = mysql_fetch_assoc($i)) {
+		while ($row = mysqli_fetch_assoc($i)) {
 			// set_elementTypes($row); // row passed as a reference.
 			$timestamp = strtotime($row['date'])*1000;				// get timestamp in seconds, convert to milliseconds
 			$stampedRow = array("timestamp"=>$timestamp) + $row;	// put it in an assoc array and merge them
@@ -313,8 +317,8 @@ function query_full_day($date, $scope){
 
 	// there's more than one charge controller, query the totals, timestamp them and add them.
 	if (count($full_day_data[3]) > 1) {
-		$result_cc_totals = mysql_query($query_cc_totals, $connection);
-		while ($row = mysql_fetch_assoc($result_cc_totals)) {
+		$result_cc_totals = mysqli_query($connection,$query_cc_totals);
+		while ($row = mysqli_fetch_assoc($result_cc_totals)) {
 			// set_elementTypes($row); // row passed as a reference.
 			$timestamp = strtotime($row['date'])*1000;				// get timestamp in seconds, convert to milliseconds
 			$stampedRow = array("timestamp"=>$timestamp) + $row;	// put it in an assoc array and merge them
@@ -339,8 +343,8 @@ function db_connection() {
 	global $dbuser;
 	global $dbname;
 	global $dbhost;
-	$connection = mysql_connect($dbhost, $dbuser, $dbpass);
-	mysql_select_db($dbname, $connection);
+	$connection = mysqli_connect($dbhost, $dbuser, $dbpass);
+	mysqli_select_db($connection, $dbname);
 	return $connection;
 }
 
