@@ -436,7 +436,9 @@ function parseFXRData($raw_data) {
 		8 => "Support",
 		9 => "Sell",
 		10 => "Pass-through",
-		14 => "Offsetting", // DPO added - operating mode specific to FRX models
+	    11 => "Slave Inverter On",	// DPO added - operating mode specific to FRX models
+		12 => "Slave Inverter Off", // DPO added - operating mode specific to FRX models
+		14 => "Offsetting",         // DPO added - operating mode specific to FRX models
 		90 => "Inverter Error",
 		91 => "AGS Error",
 		92 => "Comm Error"
@@ -528,22 +530,33 @@ function parseChargeControllerData($raw_data) {
 
 	// Aux Mode
 	$aux_byte = intval($raw_data_array[8]);
-	if ($aux_byte >= 64) {
-		$aux_byte = $aux_byte - 64;
-	}
 
+//	if ($aux_byte >= 64) {           //DPO remarked - added complete list 64-74 for AUX ON, according USB comm manual
+//		$aux_byte = $aux_byte - 64;  //DPO remarked - added complete list 64-74 for AUX ON, according USB comm manual
+//	}
 	$aux_modes = array(
 		0 => "Disabled",
-		1 => "Diversion",
-		2 => "Remote",
-		3 => "Manual",
-		4 => "Vent Fan",
-		5 => "PV Trigger",
-		6 => "Float",
-		7 => "ERROR Output",
-		8 => "Night Light",
-		9 => "PWM Diversion",
-		10 => "Low Battery"
+		1 => "Diversion-OFF",
+		2 => "Remote-OFF",
+		3 => "Manual-OFF",
+		4 => "Vent Fan-OFF",
+		5 => "PV Trigger-OFF",
+		6 => "Float-OFF",
+		7 => "ERROR Output-OFF",
+		8 => "Night Light-OFF",
+		9 => "PWM Diversion-OFF",
+		10 => "Low Battery-OFF",
+		64 => "Disabled-OFF",
+		65 => "Diversion-ON",
+		66 => "Remote-ON",
+		67 => "Manual-ON",
+		68 => "Vent Fan-ON",
+		69 => "PV Trigger-ON",
+		70 => "Float-ON",
+		71 => "ERROR Output-ON",
+		72 => "Night Light-ON",
+		73 => "PWM Diversion-ON",
+		74 => "Low Battery-ON"			
 	);
 
 	$device_array[$keys_array[6]] = $aux_modes[$aux_byte];
