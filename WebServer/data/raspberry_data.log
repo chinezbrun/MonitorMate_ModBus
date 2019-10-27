@@ -1,0 +1,26 @@
+this is not available in this release
+section will be used to display data from PowerDiversion
+
+see below
+--------------------------------------
+stamp:2019-10-27T20:09:02
+up_time:0.36 reads:60 loops:10
+GRID__time/pwr_cut[h]: 4.1/0.0
+SOLAR_time/pwr_cut[h]: 4.5/0.0
+Last_pwr_cut[h]:       0.0
+shunt_c[A]:            -0.09
+battery_voltage[V]:    52.2 SOC[%]:98
+ref_voltage_comp[V]:   52.96
+ac_out_pwr[W]:         978
+divert_pwr[W]:         -4 [corrected]:-4.5
+boiler_temperature:    20.88
+FX60Mode:              Silent PV [V]:32
+FX80Mode:              Silent PV [V]:29
+OperationalMode:       Pass-through
+grid:                  AC Use
+ac_input_voltage[V}:   224
+Diverter relay:        inactive
+Load_01 relay:         inactive
+Load_02 relay:         inactive
+Stop utilities relay:  inactive
+--------------------------------------

@@ -259,14 +259,14 @@ function get_batt_volts_gauge(chart) {
 					color: '#fadd00' // yellow
 				}, {
 					from: CONFIG.sysVoltage,
-					to: CONFIG.sysAbsorbVoltage * 0.97,
+					to: CONFIG.sysVoltage * 1.1,
 					thickness: 40,
-					color: 'rgba(57,194,29,0.50)' // green
+					color: 'rgba(57,194,29,0.25)' // green
 				}, {
-					from: CONFIG.sysAbsorbVoltage * 0.97,
+					from: CONFIG.sysVoltage * 1.1,
 					to: CONFIG.sysAbsorbVoltage * 1.03,
 					thickness: 40,
-					color: '#39c21d' // green
+					color: 'rgba(57,194,29,1.00)' // green
 				}, {
 					from: CONFIG.sysAbsorbVoltage * 1.03,
 					to: chartMax - (CONFIG.sysVoltage/24),
@@ -328,24 +328,30 @@ function get_cc_output_gauge(chart) {
 				min: 0,
 				max: CONFIG.pvWattage,
 	
-				//tickInterval: 500,
-				//minorTickInterval: 100,
+				tickInterval: 500,
+				minorTickInterval: 100,
+				
+				labels: {
+					step: 2
+				},
 				
 				plotBands: [{
 					from: 0,
-					to: (CONFIG.pvWattage*0.20),
-					thickness: 40,
-					color: 'rgba(57,194,29,0.25)' // green
-				}, {
-					from: (CONFIG.pvWattage*0.20),
 					to: (CONFIG.pvWattage*0.80),
 					thickness: 40,
-					color: 'rgba(57,194,29,0.50)' // green
+					color: 'rgba(57,194,29,1.00)' // green
 				}, {
 					from: (CONFIG.pvWattage*0.80),
+					to: (CONFIG.pvWattage*0.90),
+					thickness: 40,
+					//color: 'rgba(57,194,29,0.50)' // green
+					color: 'rgba(250,221,0,1.00)'   //yellow
+				}, {
+					from: (CONFIG.pvWattage*0.90),
 					to: CONFIG.pvWattage,
 					thickness: 40,
-					color: 'rgba(57,194,29,1.0)' // green
+					//color: 'rgba(57,194,29,1.0)'  // green
+					color: 'rgba(229,46,49,1.00)' // red
 				}]
 			},
 	
@@ -427,8 +433,8 @@ function get_inverter_power_gauge(chart) {
 				min: 0,
 				max: chart_max,
 	
-				// tickInterval: 500,
-				// minorTickInterval: 100,
+				 tickInterval: 500,
+				 minorTickInterval: 100,
 				
 				labels: {
 					step: 2
@@ -475,13 +481,14 @@ function get_fndc_shunt_gauge(shunt, chart) {
 	var chart_max = null;
 	var chart_mode = null;
 	
-	chart_chgColor[0] = "rgba(57,194,29,0.25)"; // green
-	chart_chgColor[1] = "rgba(57,194,29,0.50)"; // green
-	chart_chgColor[2] = "rgba(57,194,29,1.00)"; // green
+    chart_chgColor[0] = "rgba(250,221,0,1.00)";   // yellow  //DPO
+	chart_chgColor[1] = "rgba(250,221,0,1.00)";   // yellow  //DPO
+	chart_chgColor[2] = "rgba(229,46,49,1.00)";   // red     //DPO
+    
+	chart_disColor[0] = "rgba(57,194,29,1.00)";   // green   //DPO
+	chart_disColor[1] = "rgba(250,221,0,1.00)";   // yellow  //DPO
+	chart_disColor[2] = "rgba(229,46,49,1.00)";   // red     //DPO	
 
-	chart_disColor[0] = "rgba(250,221,0,0.25)"; // yellow
-	chart_disColor[1] = "rgba(250,221,0,0.50)"; // yellow
-	chart_disColor[2] = "rgba(250,221,0,1.00)"; // yellow
 	
 	for (var i = 0; i < json_status['devices'].length; i++) {	
 		if (json_status['devices'][i]['device_id'] == ID.fndc) {
@@ -504,11 +511,7 @@ function get_fndc_shunt_gauge(shunt, chart) {
 
 			if (shunt_amps >= 0) {
 				chart_color = chart_chgColor;
-				if (shunt_amps == 0) {
-					chart_mode = "";
-				} else {
-					chart_mode = " ↑";		
-				}
+				chart_mode = ": idle";
 				switch (shunt) {
 					case "A":
 						chart_max = CONFIG.shuntRanges.A.max;
@@ -575,25 +578,25 @@ function get_fndc_shunt_gauge(shunt, chart) {
 				min: 0,
 				max: chart_max,
 	
-	//			tickInterval: 500,
-	//			minorTickInterval: 100,
-	//
-	//			labels: {
-	//				step: 2,
-	//			},
+				tickInterval: 100,
+				minorTickInterval: 50,
+	
+				labels: {
+					step: 5,
+				},
 	
 				plotBands: [{
 					from: 0,
-					to: (chart_max*0.20),
+					to: (chart_max*0.80),
 					thickness: 40,
 					color: chart_color[0]
 				}, {
-					from: (chart_max*0.20),
-					to: (chart_max*0.80),
+					from: (chart_max*0.80),
+					to: (chart_max*0.90),
 					thickness: 40,
 					color: chart_color[1]
 				}, {
-					from: (chart_max*0.80),
+					from: (chart_max*0.90),
 					to: chart_max,
 					thickness: 40,
 					color: chart_color[2]
@@ -648,16 +651,19 @@ function get_fndc_shuntNet_gauge(chart) {
 	var chart_chgColor = [];
 	var chart_disColor = [];
 	
-	chart_chgColor[0] = "rgba(57,194,29,0.25)"; // green
-	chart_chgColor[1] = "rgba(57,194,29,0.50)"; // green
-	chart_chgColor[2] = "rgba(57,194,29,1.00)"; // green
+	chart_chgColor[0] = "rgba(57,194,29,1.00)"; // green
+//	chart_chgColor[1] = "rgba(57,194,29,0.50)"; // green
+	chart_chgColor[1] = "rgba(250,221,0,1.00)"; // yellow
+//	chart_chgColor[2] = "rgba(57,194,29,1.00)"; // green
+	chart_chgColor[2] = "rgba(229,46,49,1.00)"; // red
 
-	chart_disColor[0] = "rgba(250,221,0,0.25)"; // yellow
-	chart_disColor[1] = "rgba(250,221,0,0.50)"; // yellow
-	chart_disColor[2] = "rgba(250,221,0,1.00)"; // yellow
+	chart_disColor[0] = "rgba(57,194,29,1.00)"; // green
+	chart_disColor[1] = "rgba(250,221,0,1.00)"; // yellow
+	//chart_disColor[1] = "rgba(250,221,0,0.50)"; // yellow
+//	chart_disColor[2] = "rgba(250,221,0,1.00)"; // yellow
 //	chart_disColor[0] = "rgba(229,46,49,0.25)"; // red
 //	chart_disColor[1] = "rgba(229,46,49,0.50)"; // red
-//	chart_disColor[2] = "rgba(229,46,49,1.00)"; // red
+	chart_disColor[2] = "rgba(229,46,49,1.00)"; // red
 
 	var charge_max;
 	var discharge_max;
@@ -699,20 +705,20 @@ function get_fndc_shuntNet_gauge(chart) {
 				min: -net_max,
 				max: net_max,
 	
-	//			tickInterval: 500,
-	//			minorTickInterval: 100,
-	//
-	//			labels: {
-	//				step: 2,
-	//			},
+				tickInterval: 500,
+				minorTickInterval: 100,
+	
+				labels: {
+					step: 2,
+				},
 	
 				plotBands: [{
 					from: 0,
-					to: (net_max*0.20),
+					to: (net_max*0.50),
 					thickness: 40,
 					color: chart_chgColor[0]
 				}, {
-					from: (net_max*0.20),
+					from: (net_max*0.50),
 					to: (net_max*0.80),
 					thickness: 40,
 					color: chart_chgColor[1]
@@ -723,11 +729,11 @@ function get_fndc_shuntNet_gauge(chart) {
 					color: chart_chgColor[2]
 				}, {
 					from: 0,
-					to: -(net_max*0.20),
+					to: -(net_max*0.50),
 					thickness: 40,
 					color: chart_disColor[0]
 				}, {
-					from: -(net_max*0.20),
+					from: -(net_max*0.50),
 					to: -(net_max*0.80),
 					thickness: 40,
 					color: chart_disColor[1]

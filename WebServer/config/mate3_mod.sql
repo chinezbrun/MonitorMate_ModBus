@@ -1,6 +1,46 @@
+-- phpMyAdmin SQL Dump
+-- version 4.6.6deb4
+-- https://www.phpmyadmin.net/
 --
--- Table setup SQL for importing into your database to use Monitor Mate.
+-- Host: localhost:3306
+-- Generation Time: Jun 01, 2019 at 09:39 PM
+-- Server version: 10.1.38-MariaDB-0+deb9u1
+-- PHP Version: 7.0.33-0+deb9u3
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
 --
+-- Database: `mate3_mod`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `monitormate_cc`
+--
+
+CREATE TABLE `monitormate_cc` (
+  `date` datetime NOT NULL,
+  `address` int(11) NOT NULL,
+  `device_id` int(11) NOT NULL,
+  `charge_current` int(11) NOT NULL,
+  `pv_current` int(11) NOT NULL,
+  `pv_voltage` float NOT NULL,
+  `daily_kwh` float NOT NULL,
+  `aux_mode` varchar(32) NOT NULL,
+  `aux` varchar(32) NOT NULL,
+  `error_modes` varchar(128) NOT NULL,
+  `charge_mode` varchar(32) NOT NULL,
+  `battery_voltage` float NOT NULL,
+  `daily_ah` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -8,8 +48,8 @@
 -- Table structure for table `monitormate_fndc`
 --
 
-CREATE TABLE IF NOT EXISTS `monitormate_fndc` (
-  `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+CREATE TABLE `monitormate_fndc` (
+  `date` datetime NOT NULL,
   `address` int(11) NOT NULL DEFAULT '0',
   `device_id` int(11) DEFAULT NULL,
   `shunt_a_current` float DEFAULT NULL,
@@ -37,30 +77,7 @@ CREATE TABLE IF NOT EXISTS `monitormate_fndc` (
   `shunt_enabled_a` varchar(16) DEFAULT NULL,
   `shunt_enabled_b` varchar(16) DEFAULT NULL,
   `shunt_enabled_c` varchar(16) DEFAULT NULL,
-  `battery_temp` int(11) DEFAULT NULL,
-  PRIMARY KEY (`date`,`address`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `monitormate_cc`
---
-
-CREATE TABLE IF NOT EXISTS `monitormate_cc` (
-  `date` datetime NOT NULL,
-  `address` int(11) NOT NULL,
-  `device_id` int(11) NOT NULL,
-  `charge_current` int(11) NOT NULL,
-  `pv_current` int(11) NOT NULL,
-  `pv_voltage` float NOT NULL,
-  `daily_kwh` float NOT NULL,
-  `aux_mode` varchar(32) NOT NULL,
-  `error_modes` varchar(128) NOT NULL,
-  `charge_mode` varchar(32) NOT NULL,
-  `battery_voltage` float NOT NULL,
-  `daily_ah` int(11) NOT NULL,
-  PRIMARY KEY (`date`,`address`)
+  `battery_temp` int(11) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -69,7 +86,7 @@ CREATE TABLE IF NOT EXISTS `monitormate_cc` (
 -- Table structure for table `monitormate_fx`
 --
 
-CREATE TABLE IF NOT EXISTS `monitormate_fx` (
+CREATE TABLE `monitormate_fx` (
   `date` datetime NOT NULL,
   `address` int(11) NOT NULL,
   `device_id` int(11) NOT NULL,
@@ -84,8 +101,19 @@ CREATE TABLE IF NOT EXISTS `monitormate_fx` (
   `ac_mode` varchar(32) NOT NULL,
   `battery_voltage` float NOT NULL,
   `misc` varchar(32) NOT NULL,
-  `warning_modes` varchar(128) NOT NULL,
-  PRIMARY KEY (`date`,`address`)
+  `warning_modes` varchar(128) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `monitormate_prefs`
+--
+
+CREATE TABLE `monitormate_prefs` (
+  `uid` int(11) NOT NULL,
+  `setting` text NOT NULL,
+  `value` text NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -94,7 +122,7 @@ CREATE TABLE IF NOT EXISTS `monitormate_fx` (
 -- Table structure for table `monitormate_radian`
 --
 
-CREATE TABLE IF NOT EXISTS `monitormate_radian` (
+CREATE TABLE `monitormate_radian` (
   `date` datetime NOT NULL,
   `address` int(11) NOT NULL,
   `device_id` int(11) NOT NULL,
@@ -117,8 +145,7 @@ CREATE TABLE IF NOT EXISTS `monitormate_radian` (
   `ac_mode` varchar(32) NOT NULL,
   `battery_voltage` float NOT NULL,
   `misc` text NOT NULL,
-  `warning_modes` varchar(128) NOT NULL,
-  PRIMARY KEY (`date`,`address`)
+  `warning_modes` varchar(128) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -127,7 +154,7 @@ CREATE TABLE IF NOT EXISTS `monitormate_radian` (
 -- Table structure for table `monitormate_summary`
 --
 
-CREATE TABLE IF NOT EXISTS `monitormate_summary` (
+CREATE TABLE `monitormate_summary` (
   `date` date NOT NULL,
   `kwh_in` float NOT NULL,
   `kwh_out` float NOT NULL,
@@ -137,19 +164,58 @@ CREATE TABLE IF NOT EXISTS `monitormate_summary` (
   `min_temp` int(11) NOT NULL,
   `max_soc` int(11) NOT NULL,
   `min_soc` int(11) NOT NULL,
-  `max_pv_voltage` int(11) NOT NULL,
-  PRIMARY KEY (`date`)
+  `max_pv_voltage` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
-
 --
--- Table structure for table `monitormate_prefs`
+-- Indexes for dumped tables
 --
 
-CREATE TABLE IF NOT EXISTS `monitormate_prefs` (
-  `uid` int(11) NOT NULL AUTO_INCREMENT,
-  `setting` text NOT NULL,
-  `value` text NOT NULL,
-  PRIMARY KEY (`uid`)
-) ENGINE=MyISAM AUTO_INCREMENT DEFAULT CHARSET=utf8;
+--
+-- Indexes for table `monitormate_cc`
+--
+ALTER TABLE `monitormate_cc`
+  ADD PRIMARY KEY (`date`,`address`);
+
+--
+-- Indexes for table `monitormate_fndc`
+--
+ALTER TABLE `monitormate_fndc`
+  ADD PRIMARY KEY (`date`,`address`);
+
+--
+-- Indexes for table `monitormate_fx`
+--
+ALTER TABLE `monitormate_fx`
+  ADD PRIMARY KEY (`date`,`address`);
+
+--
+-- Indexes for table `monitormate_prefs`
+--
+ALTER TABLE `monitormate_prefs`
+  ADD PRIMARY KEY (`uid`);
+
+--
+-- Indexes for table `monitormate_radian`
+--
+ALTER TABLE `monitormate_radian`
+  ADD PRIMARY KEY (`date`,`address`);
+
+--
+-- Indexes for table `monitormate_summary`
+--
+ALTER TABLE `monitormate_summary`
+  ADD PRIMARY KEY (`date`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `monitormate_prefs`
+--
+ALTER TABLE `monitormate_prefs`
+  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

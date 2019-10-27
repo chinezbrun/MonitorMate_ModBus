@@ -33,14 +33,19 @@
 	<textarea id="status_json" class="file" spellcheck="false">
 		Loading…
 	</textarea>
-
-	<!--<h1>Last Query Executed <a href="data/query.log">(link)</a></h1>
-	<textarea id="query_log" class="file" spellcheck="false">
-		Loading…
-	</textarea>-->
 	
-	<h1>Error Log <a href="data/error.log">(link)</a> <a href="debug.php">(clear)</a></h1>
-	<textarea id="error_log" class="file" spellcheck="false">
+	<h1>general info <a href="data/general_info.log">(link)</a> <a href="clear_general_info.php">(clear)</a></h1>
+	<textarea id="general_info_log" class="file" spellcheck="false">
+		Loading…
+	</textarea>
+
+	<h1>raspberry data <a href="data/raspberry_data.log">(link)</a> <a href="clear_raspberry_data.php">(clear)</a></h1>
+	<textarea id="raspberry_data_log" class="file" spellcheck="false">
+		Loading…
+	</textarea>
+	
+	<h1>raspberry info <a href="data/raspberry_info.log">(link)</a> <a href="clear_raspberry_info.php">(clear)</a></h1>
+	<textarea id="raspberry_info_log" class="file" spellcheck="false">
 		Loading…
 	</textarea>
 	
@@ -48,9 +53,10 @@
 
 		$(document).ready(function() {
 			$("#status_json").load("data/status.json");
-			// $("#query_log").load("data/query.log");
-			$("#error_log").load("data/error.log");
-			get_current_status();
+			$("#general_info_log").load("data/general_info.log");     //DPO added
+			$("#raspberry_data_log").load("data/raspberry_data.log"); //DPO added
+			$("#raspberry_info_log").load("data/raspberry_info.log"); //DPO added
+			get_current_status(); 
 			$('#server_local_time').text(json_status['time'].server_local_time);
 			$('#relay_local_time').text(json_status['time'].relay_local_time);
 			$('#mate_local_time').text(json_status['time'].mate_local_time);

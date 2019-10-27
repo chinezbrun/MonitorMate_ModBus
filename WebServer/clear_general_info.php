@@ -15,7 +15,7 @@ for more details.
 
 // Right now all this script doese is clear the error log. Ultimately this'll be
 // a php replacement for the debug html file.
-file_put_contents('./data/error.log', NULL);
+file_put_contents('./data/general_info.log', NULL);
 header("Location: debug.html");
 
 ?>
