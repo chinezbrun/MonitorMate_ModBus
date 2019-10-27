@@ -1,4 +1,4 @@
-MonitorMate
+MonitorMate-Modbus
 ===========
 
 A monitoring system for the Outback Power MATE3. It processes the data stream, reformats it for logging, charting, and display on a web server.
