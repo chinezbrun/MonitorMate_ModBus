@@ -18,9 +18,9 @@ The software is divided in two parts:
 
 ReadMateStatusModBus.py
 ===========
-Query MATE3/MATE3S and gets data, format, register in the database and returns a json file that is used for display current status.
-ReadMateStatusModBus.py script is running once every X minute -- task should be created (windows or Linux)
-ReadMateStatusModBus.cfg is the config file for this script
+- Query MATE3/MATE3S and gets data, format, register in the database and returns a json file that is used for display current status.
+- ReadMateStatusModBus.py script is running once every X minute -- task should be created (windows or Linux)
+- ReadMateStatusModBus.cfg is the config file for this script
 
 ReadMateStatusModBus.sh (is not mandatory)
 ===========
