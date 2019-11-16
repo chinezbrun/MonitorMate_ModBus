@@ -9,7 +9,7 @@ from pymodbus.payload import BinaryPayloadDecoder
 from configparser import ConfigParser
 import sys, os
 
-script_ver = "0.1.20191015"
+script_ver = "0.1.20191101"
 print ("script version: "+ script_ver)
 
 pathname          = os.path.dirname(sys.argv[0])        
