@@ -1281,6 +1281,38 @@ function chart_months(date) {
 			marginTop: 20,
 			zoomType: 'none'
 		},
+	//dpo added	
+		plotOptions: {
+			series: {
+				point: {
+					events: {
+						click: function() {
+							// FIXME: maybe i shouldn't be using a global variable?
+							display_date = get_formatted_date(this.x);
+							// tricky way to get the document name from the path.
+							var page = location.pathname.substring(location.pathname.lastIndexOf("/") + 1);
+							// remove the query string, if there is one.
+							page = page.split("?")[0];
+
+							switch (page) {
+								case "historical.html":
+									refresh_data();
+									break;
+								default:
+									location.assign('historical.html?date=' + display_date);
+									break;
+							}
+						}
+					}
+				}
+			}
+		},
+		
+		
+	//dpo end	
+		
+		
+		
 		legend: {
 			enabled: false
 		},
