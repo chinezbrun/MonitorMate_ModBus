@@ -28,7 +28,9 @@
 		<div id="button-cluster">
 			<button onclick="change_day(-1)" class="square">&#9664;</button><button onclick="change_day(0)">Today</button><button onclick="change_day(1)" class="square">&#9654;</button>
 		</div>
-	</div>
+	
+		</div>
+
 	<div class="bottom-double-charts">
 		<div id="years_chart" class="left-chart"></div>
 		<div id="months_chart" class="right-chart"></div>
@@ -78,33 +80,34 @@
 	</div>
 
 	<script>
-		
+
 		function refresh_data(update) {
 
 			/*global display_date */
 			// var update = (update != false)? true : false;
-			
+
 			if (display_date == get_formatted_date()) { // if it's today.
 				update_URL('historical.html');
 				document.title = "MonitorMate: Today";
 			} else {
 				update_URL('historical.html', display_date);
 				document.title = "MonitorMate: " + display_date;
+				//chart_days(display_date)
 			}
 
 			$('#display-date').text(display_date);
 
 //			// FIXME: check if i need to redraw the charts, it's a waste of time otherwise.
-//			var chartDate = null;
+			var chartDate = null;
 //
-//			if (display_date != get_formatted_date()) {	// if the date isn't today
-//				chartDate = display_date;
-//			}
+			if (display_date != get_formatted_date()) {	// if the date isn't today
+				chartDate = display_date;
+			}
 //
 //			// FIXME: I should make the charting functions do a setData instead of replotting from scratch
 //			chart_years(chartDate, 'set');
 //			chart_months(chartDate, 'set');
-//			chart_days(chartDate, 'set');
+			chart_days(chartDate, 'set');
 
 			get_dataStream(display_date);
 
@@ -118,6 +121,7 @@
 			draw_chart('cc_charge_current', update);
 			draw_chart('cc_input_volts', update);
 			draw_chart('cc_input_current', update);
+			
 		}
 
 
@@ -130,6 +134,7 @@
 			
 			if (delta == 0) {
 				display_date = get_formatted_date();
+                chart_days();
 			} else {
 				split_date = display_date.split(/[- :]/);
 				new_date = new Date(parseInt(split_date[0]), parseInt(split_date[1] - 1), parseInt(split_date[2]));
@@ -141,12 +146,11 @@
 					alert("You can't predict the future...");
 					return;
 				}
-			}
-
+			  }
+		  
 			refresh_data(false);
 
 		}
-
 
 		$(document).ready(function() {
 
@@ -156,6 +160,7 @@
 			if (URLvars.date) {
 				// put the date from the querystring into the text field
 				display_date = URLvars.date;
+
 			} else {
 				// put today into the text field
 				display_date = get_formatted_date();
