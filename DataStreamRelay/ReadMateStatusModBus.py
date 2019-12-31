@@ -9,7 +9,7 @@ from pymodbus.payload import BinaryPayloadDecoder
 from configparser import ConfigParser
 import sys, os
 
-script_ver = "0.1.20191101"
+script_ver = "0.4.20191231"
 print ("script version: "+ script_ver)
 
 pathname          = os.path.dirname(sys.argv[0])        
@@ -471,10 +471,10 @@ while True:
                 CCconfig_Faults = int(response.registers[0])
                 logging.info(".... CC Error Flags " + str(CCconfig_Faults))
                 error_flags='None'            
-                if GS_Split_Error_Flags == 16:  error_flags='Fault Input Active'                
-                if GS_Split_Error_Flags == 32:  error_flags='Shorted Battery Temp Sensor'
-                if GS_Split_Error_Flags == 64:  error_flags='Over Temp'               
-                if GS_Split_Error_Flags == 128: error_flags='High VOC'                
+                if CCconfig_Faults == 16:  error_flags='Fault Input Active'                
+                if CCconfig_Faults == 32:  error_flags='Shorted Battery Temp Sensor'
+                if CCconfig_Faults == 64:  error_flags='Over Temp'               
+                if CCconfig_Faults == 128: error_flags='High VOC'                
 
                 # Controlers data - JSON preparation
                 devices_array= {
