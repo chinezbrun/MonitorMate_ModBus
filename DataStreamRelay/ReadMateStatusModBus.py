@@ -7,9 +7,12 @@ from pymodbus.client.sync import ModbusTcpClient as ModbusClient
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
 from configparser import ConfigParser
+import paho.mqtt.client as mqtt
+import paho.mqtt.publish as publish
+import shutil  
 import sys, os
 
-script_ver = "0.4.20191231"
+script_ver = "0.5.0_20200306"
 print ("script version: "+ script_ver)
 
 pathname          = os.path.dirname(sys.argv[0])        
@@ -32,8 +35,14 @@ user              = config.get('Maria DB connection', 'user')
 password          = config.get('Maria DB connection', 'password')
 database          = config.get('Maria DB connection', 'database')
 ServerPath        = config.get('WebServer path', 'ServerPath')
+DuplicateSave     = config.get('WebServer path', 'DuplicateSave')
+DuplicatePath     = config.get('WebServer path', 'DuplicatePath')
+MQTT_active       = config.get('MQTT', 'MQTT_active')
+MQTT_broker       = config.get('MQTT', 'MQTT_broker')
+
 print("SQL active: " ,SQL_active)
 print("port:       ", db_port)
+print("MQTT active:",MQTT_active)
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%Y%m%d %H:%M:%S')
@@ -204,8 +213,7 @@ def ErrorPrint (str) :
             file.write(save)
         return
     except OSError:
-       print(str,"Error: RMS - Errorhandling block: double error")
-
+        print(str,"Error: RMS - Errorhandling block: double error")
 
 print("------------------------------------------------")
 print(" MATE3 ModBus Interface")
@@ -401,6 +409,12 @@ while True:
                     mycursor.close()
                     mydb.close()
                     logging.info(".. FXR Data recorded succesfull " )
+                
+                # send data via MQTT    
+                if MQTT_active=='true':
+                    publish.single('home-assistant/solar/solar_ac_input', gs_single_ac_input_voltage, hostname=MQTT_broker)
+                    publish.single('home-assistant/solar/solar_ac_mode', ac_use, hostname=MQTT_broker)
+                    publish.single('home-assistant/solar/solar_operational_mode', operating_modes, hostname=MQTT_broker)
                     
         except:            
             ErrorPrint("Error: RMS - in port " + str(port) + " FXR module")
@@ -760,7 +774,12 @@ while True:
                     mycursor.close()
                     mydb.close()
                     logging.info(".. FNDC Data recorded succesfull " )
-
+                    
+                # send data via MQTT
+                if MQTT_active=='true':
+                    publish.single('home-assistant/solar/solar_bat_voltage', round(fn_battery_voltage,1), hostname=MQTT_broker)
+                    publish.single('home-assistant/solar/solar_soc', fn_state_of_charge, hostname=MQTT_broker)
+                    
         except:
             ErrorPrint("Error: RMS - in port " + str(port) + " FNDC module")
 
@@ -849,6 +868,8 @@ while True:
     json_data={"time":time, "devices":devices, "summary":summary}
     with open(ServerPath + '/data/status.json', 'w') as outfile:  
         json.dump(json_data, outfile)
-    
-    #time.sleep(30)
+    if DuplicateSave == 'true':
+        shutil.copy(ServerPath + '/data/status.json', DuplicatePath + '/data/status.json') #copy the file in second location
+   
+   #time.sleep(30)
     break # DPO - remark it if continuous loop needed
