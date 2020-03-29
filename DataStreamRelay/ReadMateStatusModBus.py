@@ -12,7 +12,7 @@ import paho.mqtt.publish as publish
 import shutil  
 import sys, os
 
-script_ver = "0.5.0_20200306"
+script_ver = "0.5.1_20200329"
 print ("script version: "+ script_ver)
 
 pathname          = os.path.dirname(sys.argv[0])        
@@ -53,11 +53,11 @@ date_str         = now.strftime("%Y-%m-%dT%H:%M:%S")
 date_sql         = datetime.now().replace(second=0, microsecond=0)
 
 device_list=[          # used in main loop      
-    "VFXR3048_master", #port 1
+    "VFXR3048_master", #port 1   used fot MQTT data
     "VFXR3048_slave",  #port 2
     "FM60",            #port 3
     "FM80",            #port 4
-    "FNDC"             #port 5
+    "FNDC"             #port 5   used for MQTT data
     ]
 
 shunt_list=[            # used in main loop
@@ -249,8 +249,10 @@ while True:
     "mate_local_time": date_str,
     "server_local_time": date_str}
     
-    devices=[]                                     # used for JSON file - list of data for all devices
-   
+    devices = []                                     # used for JSON file - list of data for all devices
+    various = []                                     # used for JSON file - different data not connected with MateMonitoring project
+    CC_total_watts = 0                               # used for MQTT to sum the total pv power from charge controlers
+    
     reg = startReg
     for block in range(0, 30):
         #print ("Getting data from Register=" + str(reg) + " last size was " + str(size)) #DPO debug
@@ -324,7 +326,7 @@ while True:
                 logging.info(".... FXR AC USE (Y/N) " + str(gs_single_ac_input_state) + " " + ac_use)
                 
                 response = client.read_holding_registers(reg + 17, 1)
-                gs_single_battery_voltage = round(int(response.registers[0]) * 0.1,2)
+                gs_single_battery_voltage = round(int(response.registers[0]) * 0.1,1)
                 logging.info(".... FXR Battery voltage (V) " + str(gs_single_battery_voltage))
                 
                 response = client.read_holding_registers(reg + 18, 1)
@@ -411,14 +413,52 @@ while True:
                     logging.info(".. FXR Data recorded succesfull " )
                 
                 # send data via MQTT    
-                if MQTT_active=='true':
+                if MQTT_active=='true' and device_list[port]=='VFXR3048_master' :
                     publish.single('home-assistant/solar/solar_ac_input', gs_single_ac_input_voltage, hostname=MQTT_broker)
+                    publish.single('home-assistant/solar/solar_ac_output', gs_single_output_ac_voltage, hostname=MQTT_broker)
                     publish.single('home-assistant/solar/solar_ac_mode', ac_use, hostname=MQTT_broker)
                     publish.single('home-assistant/solar/solar_operational_mode', operating_modes, hostname=MQTT_broker)
-                    
+                                        
         except:            
             ErrorPrint("Error: RMS - in port " + str(port) + " FXR module")
-  
+        try:
+            if "Radian Inverter Configuration Block" in blockResult['DID']:
+                
+                response = client.read_holding_registers(reg + 26, 1)
+                GSconfig_Grid_Input_Mode = int(response.registers[0])
+                logging.info(".... FXR Grid input Mode " + str(GSconfig_Grid_Input_Mode))
+                grid_input_mode='None'
+                if GSconfig_Grid_Input_Mode == 0:   grid_input_mode ='Generator'
+                if GSconfig_Grid_Input_Mode == 1:   grid_input_mode ='Support'               
+                if GSconfig_Grid_Input_Mode == 2:   grid_input_mode ='Grid Tied'
+                if GSconfig_Grid_Input_Mode == 3:   grid_input_mode ='UPS'               
+                if GSconfig_Grid_Input_Mode == 4:   grid_input_mode ='Backup'                
+                if GSconfig_Grid_Input_Mode == 5:   grid_input_mode ='Mini Grid' 
+                if GSconfig_Grid_Input_Mode == 6:   grid_input_mode ='Grid Zero'
+                
+                response = client.read_holding_registers(reg + 24, 1)
+                GSconfig_Charger_Operating_Mode = int(response.registers[0])
+                logging.info(".... FXR Charger Mode " + str(GSconfig_Charger_Operating_Mode))
+                charger_mode='None'
+                if GSconfig_Charger_Operating_Mode == 0:   charger_mode ='OFF'
+                if GSconfig_Charger_Operating_Mode == 1:   charger_mode ='ON'
+                
+                if MQTT_active=='true' and device_list[port]=='VFXR3048_master':
+                    publish.single('home-assistant/solar/solar_grid_input_mode', grid_input_mode, hostname=MQTT_broker)
+                    publish.single('home-assistant/solar/solar_charger_mode', charger_mode, hostname=MQTT_broker)
+                    
+                # FXR dataconfig - JSON preparation
+                various_array={
+                  "address": address,
+                  "device_id": 5,
+                  "grid_input_mode": grid_input_mode,
+                  "charger_mode": charger_mode
+                  }
+                various.append(various_array)     # append FXR data to devices
+        
+        except:
+            ErrorPrint("Error: RMS - in port " + str(port) + " FXR config block")
+        
         try:
             if "Charge Controller Block" in blockResult['DID']:
                 logging.info(".. Detected a Charge Controller Block")
@@ -443,6 +483,11 @@ while True:
                 response = client.read_holding_registers(reg + 18, 1)
                 CC_Todays_KW = round(int(response.registers[0]) * 0.1,2)
                 logging.info(".... CC Daily_KW (KW) " + str(CC_Todays_KW))
+
+                response = client.read_holding_registers(reg + 13, 1)
+                CC_Watts = round(int(response.registers[0]),2)
+                logging.info(".... CC Actual_watts (W) " + str(CC_Watts))
+                CC_total_watts = CC_total_watts + CC_Watts
 
                 response = client.read_holding_registers(reg + 12, 1)
                 cc_charger_state = round(int(response.registers[0]),2)
@@ -526,7 +571,7 @@ while True:
                     mycursor.close()
                     mydb.close()
                     logging.info(".. CC Data recorded succesfull " )
-
+ 
         except:
             ErrorPrint("Error: RMS - in port " + str(port) + " CC module")
 
@@ -777,9 +822,12 @@ while True:
                     
                 # send data via MQTT
                 if MQTT_active=='true':
-                    publish.single('home-assistant/solar/solar_bat_voltage', round(fn_battery_voltage,1), hostname=MQTT_broker)
+                    publish.single('home-assistant/solar/solar_bat_voltage', fn_battery_voltage, hostname=MQTT_broker)
                     publish.single('home-assistant/solar/solar_soc', fn_state_of_charge, hostname=MQTT_broker)
-                    
+                    publish.single('home-assistant/solar/solar_bat_temp', fn_battery_temperature, hostname=MQTT_broker)
+                    publish.single('home-assistant/solar/solar_divert_amp', fn_shunt_c_current, hostname=MQTT_broker)
+                    publish.single('home-assistant/solar/solar_used_amp', fn_shunt_b_current, hostname=MQTT_broker)
+
         except:
             ErrorPrint("Error: RMS - in port " + str(port) + " FNDC module")
 
@@ -789,7 +837,7 @@ while True:
             client.close()
             logging.info(" Mate connection closed ")
             break
-   
+
   # # Upload Summary data to SQL database
     min_bat_temp = None 
     max_bat_temp = None
@@ -862,14 +910,19 @@ while True:
         "min_temp": min_bat_temp,
         "min_soc": FN_Todays_Minimum_SOC,
         "max_soc": FN_Todays_Maximum_SOC,
-        "max_pv_voltage": max_pv_voltage
+        "max_pv_voltage": max_pv_voltage,
+        "pv_watts": CC_total_watts
     }
     
-    json_data={"time":time, "devices":devices, "summary":summary}
+    json_data={"time":time, "devices":devices, "summary":summary, "various":various}
     with open(ServerPath + '/data/status.json', 'w') as outfile:  
         json.dump(json_data, outfile)
     if DuplicateSave == 'true':
         shutil.copy(ServerPath + '/data/status.json', DuplicatePath + '/data/status.json') #copy the file in second location
+    
+    # summary values - send data via MQTT 
+    if MQTT_active=='true':
+        publish.single('home-assistant/solar/solar_pv_watts', CC_total_watts, hostname=MQTT_broker)
    
    #time.sleep(30)
     break # DPO - remark it if continuous loop needed
