@@ -12,7 +12,7 @@ import paho.mqtt.publish as publish
 import shutil  
 import sys, os
 
-script_ver = "0.5.1_20200329"
+script_ver = "0.5.1_20200401"
 print ("script version: "+ script_ver)
 
 pathname          = os.path.dirname(sys.argv[0])        
@@ -685,6 +685,10 @@ while True:
                 FN_Charge_Factor_Corrected_NET_Battery_kWh = round(decode_int16(int(response.registers[0])) * 0.01,2)
                 logging.info(".... FN_Charge_Factor_Corrected_NET_Battery_kWh " + str(FN_Charge_Factor_Corrected_NET_Battery_kWh))
                 
+                response = client.read_holding_registers(reg + 26, 1)
+                FN_Days_Since_Charge_Parameters_Met = round(int(response.registers[0]) * 0.1,2)
+                logging.info(".... FN_Days_Since_Charge_Parameters_Met " + str(FN_Days_Since_Charge_Parameters_Met))
+                
             if "FLEXnet-DC Configuration Block" in blockResult['DID']:
                 logging.info(".. Detect a FLEXnet-DC Configuration Block")
 
@@ -827,7 +831,8 @@ while True:
                     publish.single('home-assistant/solar/solar_bat_temp', fn_battery_temperature, hostname=MQTT_broker)
                     publish.single('home-assistant/solar/solar_divert_amp', fn_shunt_c_current, hostname=MQTT_broker)
                     publish.single('home-assistant/solar/solar_used_amp', fn_shunt_b_current, hostname=MQTT_broker)
-
+                    publish.single('home-assistant/solar/solar_charge_met', FN_Days_Since_Charge_Parameters_Met, hostname=MQTT_broker)
+                    
         except:
             ErrorPrint("Error: RMS - in port " + str(port) + " FNDC module")
 
