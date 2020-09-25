@@ -19,4 +19,6 @@ versions history:
 0.5.0_20190307 - add MQTT for Home Automation integration (Bat, SOC,AC, Operational Mode)
                  add option for second path for JSON file (potential use in Home Automation)
                  ReadMateStaus.cfg updated
-0.5.1_20190401 - more MQTT parameter added, integated with Home Assistant, smmal bug fixes
+0.5.1_20190401 - more MQTT parameter added for Home Automation integration, smmal bug fixes
+0.5.2_20200522 - changes in grid_input_mode list - removes blanks
+0.5.3_20200903 - more MQTT parameter added for Home Automation integration
