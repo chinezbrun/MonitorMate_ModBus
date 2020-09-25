@@ -12,7 +12,7 @@ import paho.mqtt.publish as publish
 import shutil  
 import sys, os
 
-script_ver = "0.5.1_20200401"
+script_ver = "0.5.3_20200903"
 print ("script version: "+ script_ver)
 
 pathname          = os.path.dirname(sys.argv[0])        
@@ -430,11 +430,11 @@ while True:
                 grid_input_mode='None'
                 if GSconfig_Grid_Input_Mode == 0:   grid_input_mode ='Generator'
                 if GSconfig_Grid_Input_Mode == 1:   grid_input_mode ='Support'               
-                if GSconfig_Grid_Input_Mode == 2:   grid_input_mode ='Grid Tied'
+                if GSconfig_Grid_Input_Mode == 2:   grid_input_mode ='GridTied'
                 if GSconfig_Grid_Input_Mode == 3:   grid_input_mode ='UPS'               
                 if GSconfig_Grid_Input_Mode == 4:   grid_input_mode ='Backup'                
-                if GSconfig_Grid_Input_Mode == 5:   grid_input_mode ='Mini Grid' 
-                if GSconfig_Grid_Input_Mode == 6:   grid_input_mode ='Grid Zero'
+                if GSconfig_Grid_Input_Mode == 5:   grid_input_mode ='MiniGrid' 
+                if GSconfig_Grid_Input_Mode == 6:   grid_input_mode ='GridZero'
                 
                 response = client.read_holding_registers(reg + 24, 1)
                 GSconfig_Charger_Operating_Mode = int(response.registers[0])
@@ -533,7 +533,10 @@ while True:
                 if CCconfig_Faults == 16:  error_flags='Fault Input Active'                
                 if CCconfig_Faults == 32:  error_flags='Shorted Battery Temp Sensor'
                 if CCconfig_Faults == 64:  error_flags='Over Temp'               
-                if CCconfig_Faults == 128: error_flags='High VOC'                
+                if CCconfig_Faults == 128: error_flags='High VOC'
+                
+                if MQTT_active=='true' and device_list[port]=='FM80':
+                    publish.single('home-assistant/solar/solar_charge_mode', cc_mode, hostname=MQTT_broker)              
 
                 # Controlers data - JSON preparation
                 devices_array= {
