@@ -11,7 +11,7 @@ import paho.mqtt.publish as publish
 import shutil  
 import sys, os
 
-script_ver = "0.6.0_20210121"
+script_ver = "0.6.1_20211023"
 print ("script version: "+ script_ver)
 
 pathname          = os.path.dirname(sys.argv[0])        
@@ -442,6 +442,8 @@ while True:
                   "charger_mode": charger_mode
                   }
                 various.append(various_array)     # append FXR data to devices
+                devices[address-1]["grid_input_mode"] = grid_input_mode
+                devices[address-1]["charger_mode"] = charger_mode
                 
                 # FXR dataconfig - Mqtt preparation
                 if device_list[port]=='VFXR3048_master':
@@ -808,7 +810,9 @@ while True:
                      'home-assistant/solar/solar_divert_amp':fn_shunt_c_current,
                      'home-assistant/solar/solar_used_amp':fn_shunt_b_current,
                      'home-assistant/solar/solar_charge_met':charge_params_met,
-                     'home-assistant/solar/solar_since_charge_met':FN_Days_Since_Charge_Parameters_Met})
+                     'home-assistant/solar/solar_since_charge_met':FN_Days_Since_Charge_Parameters_Met,
+                     'home-assistant/solar/solar_today_net_input_kwh':FN_Todays_NET_Input_kWh,
+                     'home-assistant/solar/solar_today_net_output_kwh':FN_Todays_NET_Output_kWh})
 
         except Exception as e:
             ErrorPrint("Error: RMS - port: " + str(port) + " FNDC module " + str(e))
