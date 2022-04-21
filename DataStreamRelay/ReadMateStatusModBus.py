@@ -873,6 +873,18 @@ while True:
             
             for x in myresult:
                 max_pv_voltage=int(x[0])
+                
+            sql="SELECT min(charge_factor_corrected_net_batt_ah), min(charge_factor_corrected_net_batt_kwh) FROM monitormate_fndc WHERE date(date) = DATE(NOW())"    
+
+            mycursor = mydb.cursor()
+            mycursor.execute(sql)
+            myresult = mycursor.fetchall()
+            
+            for x in myresult:
+                out_batt_ah  = 0
+                out_batt_kwh = 0
+                if x[0] is not None: out_batt_ah  = x[0]    
+                if x[1] is not None: out_batt_kwh = x[1]            
             
             sql="SELECT date,kwh_in,kwh_out,ah_in,max_temp,min_temp,max_soc,min_soc,max_pv_voltage FROM monitormate_summary \
             where date(date)= DATE(NOW())"
@@ -882,18 +894,18 @@ while True:
             myresult = mycursor.fetchall()
             
             if not myresult:                                                               # check if any records for today - if not, record for the first time
-                val=(date_now,FN_Todays_NET_Input_kWh,FN_Todays_NET_Output_kWh,FN_Todays_NET_Input_AH,FN_Todays_NET_Output_AH,
+                val=(date_now,FN_Todays_NET_Input_kWh,FN_Todays_NET_Output_kWh,FN_Todays_NET_Input_AH,FN_Todays_NET_Output_AH,out_batt_ah,out_batt_kwh,
                      max_bat_temp,min_bat_temp,FN_Todays_Maximum_SOC,FN_Todays_Minimum_SOC,max_pv_voltage)
-                sql="INSERT INTO monitormate_summary (date,kwh_in,kwh_out,ah_in,ah_out,max_temp,min_temp,max_soc,min_soc,max_pv_voltage)\
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                sql="INSERT INTO monitormate_summary (date,kwh_in,kwh_out,ah_in,ah_out,out_batt_ah,out_batt_kwh,max_temp,min_temp,max_soc,min_soc,max_pv_voltage)\
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
                 mycursor = mydb.cursor()
                 mycursor.execute(sql, val)
                 mydb.commit()
                 logging.info(" Summary of the day - first record completed")
             else:                                                                           # if records - update table
-                val=(FN_Todays_NET_Input_kWh,FN_Todays_NET_Output_kWh,FN_Todays_NET_Input_AH,FN_Todays_NET_Output_AH,
+                val=(FN_Todays_NET_Input_kWh,FN_Todays_NET_Output_kWh,FN_Todays_NET_Input_AH,FN_Todays_NET_Output_AH,out_batt_ah,out_batt_kwh,
                      max_bat_temp,min_bat_temp,FN_Todays_Maximum_SOC,FN_Todays_Minimum_SOC,max_pv_voltage,date_now)
-                sql="UPDATE monitormate_summary SET kwh_in=%s,kwh_out=%s,ah_in=%s,ah_out=%s,max_temp=%s,min_temp=%s,\
+                sql="UPDATE monitormate_summary SET kwh_in=%s,kwh_out=%s,ah_in=%s,ah_out=%s,out_batt_ah=%s,out_batt_kwh=%s,max_temp=%s,min_temp=%s,\
                 max_soc=%s,min_soc=%s,max_pv_voltage=%s WHERE date=%s"
                 mycursor = mydb.cursor()
                 mycursor.execute(sql, val)
