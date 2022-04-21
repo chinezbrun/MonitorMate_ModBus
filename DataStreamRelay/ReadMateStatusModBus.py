@@ -11,7 +11,7 @@ import paho.mqtt.publish as publish
 import shutil  
 import sys, os
 
-script_ver = "0.6.1_20211023"
+script_ver = "0.7.0_20220421"
 print ("script version: "+ script_ver)
 
 pathname          = os.path.dirname(sys.argv[0])        
