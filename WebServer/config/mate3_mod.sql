@@ -1,13 +1,15 @@
 -- phpMyAdmin SQL Dump
--- version 4.6.6deb4
+-- version 4.9.7
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Jun 01, 2019 at 09:39 PM
--- Server version: 10.1.38-MariaDB-0+deb9u1
--- PHP Version: 7.0.33-0+deb9u3
+-- Host: localhost
+-- Generation Time: Apr 21, 2022 at 10:07 PM
+-- Server version: 10.3.32-MariaDB
+-- PHP Version: 7.4.24
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -50,7 +52,7 @@ CREATE TABLE `monitormate_cc` (
 
 CREATE TABLE `monitormate_fndc` (
   `date` datetime NOT NULL,
-  `address` int(11) NOT NULL DEFAULT '0',
+  `address` int(11) NOT NULL DEFAULT 0,
   `device_id` int(11) DEFAULT NULL,
   `shunt_a_current` float DEFAULT NULL,
   `shunt_b_current` float DEFAULT NULL,
@@ -156,10 +158,12 @@ CREATE TABLE `monitormate_radian` (
 
 CREATE TABLE `monitormate_summary` (
   `date` date NOT NULL,
-  `kwh_in` float NOT NULL,
-  `kwh_out` float NOT NULL,
   `ah_in` int(11) NOT NULL,
   `ah_out` int(11) NOT NULL,
+  `kwh_in` float NOT NULL,
+  `kwh_out` float NOT NULL,
+  `out_batt_ah` float NOT NULL,
+  `out_batt_kwh` float NOT NULL,
   `max_temp` int(11) NOT NULL,
   `min_temp` int(11) NOT NULL,
   `max_soc` int(11) NOT NULL,
@@ -215,7 +219,9 @@ ALTER TABLE `monitormate_summary`
 -- AUTO_INCREMENT for table `monitormate_prefs`
 --
 ALTER TABLE `monitormate_prefs`
-  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `uid` int(11) NOT NULL AUTO_INCREMENT;
+COMMIT;
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
