@@ -1,4 +1,4 @@
-MonitorMate_ModBus
+MonitorMate_ModBus 
 ===========
 
 A monitoring system for the Outback Power MATE3/MATE3S. 
@@ -57,3 +57,5 @@ ex: windows: D:\xampp\python\python37\python.exe D:\DataStreamRelay\ReadMateStat
 depending on your paths
 
 Go to  http://www.YOURSERVER.com/index.php (maybe you have to wait a little depending your record interval.)
+
+NOTE : this repository reached EOL - no support will be provided as of 01.12.2024
